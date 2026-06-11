@@ -13,7 +13,6 @@ AI-powered Code Review and Optimization Platform.
 - Multi-language Support
 - JWT Authentication
 - History Page
-- Profile Page
 - Charts and Analytics
 - PDF Export
 
@@ -49,3 +48,51 @@ cd frontend
 npm install
 npm run dev
 ```
+## Folder Structure
+
+```text
+CodeRefine
+│
+├── backend
+│
+│ ├── api
+│ ├── core
+│ ├── db
+│ ├── models
+│ ├── schemas
+│ ├── services
+│ └── main.py
+│
+├── frontend
+│
+│ ├── components
+│ ├── pages
+│ ├── services
+│ └── App.jsx
+│
+├── images
+│ └── dashboard.png
+│
+└── README.md
+```
+
+## API Features
+
+* User Registration
+* Login with JWT Authentication
+* Profile Page
+* AI Code Review
+* AI Code Rewrite
+* Review History
+* Charts and Analytics
+* PDF Export
+
+## Future Enhancements
+
+* Docker Support
+* CI/CD Pipeline
+* VS Code Extension
+* GitHub Integration
+* AI Chat Assistant
+* Team Collaboration
+
