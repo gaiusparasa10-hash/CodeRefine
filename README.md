@@ -96,3 +96,4 @@ CodeRefine
 * AI Chat Assistant
 * Team Collaboration
 
+cd C:\Users\GAIUS\OneDrive\Desktop\CodeRefine_project\backend
