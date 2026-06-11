@@ -50,7 +50,7 @@ npm run dev
 ```
 ## Folder Structure
 
-```text
+``text
 CodeRefine
 │
 ├── backend
