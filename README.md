@@ -2,6 +2,10 @@
 
 AI-powered Code Review and Optimization Platform.
 
+## Preview
+
+![Dashboard](images/dashboard.png)
+
 ## Features
 
 - AI Code Review
