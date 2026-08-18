@@ -64,10 +64,18 @@ export default function Dashboard() {
       toast.success("Code analysis completed successfully!");
     } catch (error) {
       console.error("Review request error:", error);
-      const errorMessage =
-        error.response?.data?.detail ||
-        "Could not connect to the server. Please check that backend is running.";
-      toast.error(errorMessage);
+      if (!error.response) {
+        toast.error("Could not connect to the server. Please check that the backend is running.");
+      } else if (error.response.status >= 500) {
+        const detail = String(error.response.data?.detail || "");
+        if (detail.toLowerCase().includes("groq") || detail.toLowerCase().includes("model") || detail.toLowerCase().includes("404")) {
+          toast.error("AI service is temporarily unavailable. Please try again.");
+        } else {
+          toast.error("AI review failed. Please try again.");
+        }
+      } else {
+        toast.error(error.response.data?.detail || "AI review failed. Please try again.");
+      }
     } finally {
       setLoadingReview(false);
     }
@@ -90,14 +98,23 @@ export default function Dashboard() {
       toast.success("Code rewritten successfully!");
     } catch (error) {
       console.error("Rewrite request error:", error);
-      const errorMessage =
-        error.response?.data?.detail ||
-        "Could not connect to the server. Please check that backend is running.";
-      toast.error(errorMessage);
+      if (!error.response) {
+        toast.error("Could not connect to the server. Please check that the backend is running.");
+      } else if (error.response.status >= 500) {
+        const detail = String(error.response.data?.detail || "");
+        if (detail.toLowerCase().includes("groq") || detail.toLowerCase().includes("model") || detail.toLowerCase().includes("404")) {
+          toast.error("AI service is temporarily unavailable. Please try again.");
+        } else {
+          toast.error("AI rewrite failed. Please try again.");
+        }
+      } else {
+        toast.error(error.response.data?.detail || "AI rewrite failed. Please try again.");
+      }
     } finally {
       setLoadingRewrite(false);
     }
   };
+
 
   return (
     <div className="min-h-screen bg-slate-950 text-slate-100 p-4 sm:p-8">

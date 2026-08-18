@@ -1,4 +1,4 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, HTTPException
 from app.schemas.rewrite import RewriteRequest
 from app.services.groq_service import rewrite_code
 from app.services.rewrite_parser import parse_rewrite_response
@@ -11,9 +11,7 @@ router = APIRouter(
 
 @router.post("/")
 def rewrite(request: RewriteRequest):
-
     try:
-
         result = rewrite_code(
             request.code,
             request.language
@@ -26,13 +24,8 @@ def rewrite(request: RewriteRequest):
         return parsed_result
 
     except Exception as e:
-
-        return {
-
-            "optimized_code": "",
-
-            "explanation":
-
-                f"Rewrite failed: {str(e)}"
-
-        }
+        print(f"Rewrite API Exception: {e}")
+        raise HTTPException(
+            status_code=500,
+            detail=f"AI Rewrite Error: {str(e)}"
+        )

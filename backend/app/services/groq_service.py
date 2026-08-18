@@ -1,18 +1,18 @@
-import code
-
 from groq import Groq
-from dotenv import load_dotenv
+from dotenv import load_dotenv, find_dotenv
 import os
 
-load_dotenv()
+load_dotenv(find_dotenv(usecwd=True))
+
+GROQ_API_KEY = os.getenv("GROQ_API_KEY")
+GROQ_MODEL = os.getenv("GROQ_MODEL", "openai/gpt-oss-120b")
 
 client = Groq(
-    api_key=os.getenv("GROQ_API_KEY")
+    api_key=GROQ_API_KEY
 )
 
 
 def review_code(code: str, language: str):
-
     prompt = f"""
 You are a Principal Software Engineer, Security Expert, and Static Code Analysis Specialist.
 
@@ -165,7 +165,7 @@ CODE TO REVIEW
 """
 
     response = client.chat.completions.create(
-        model="llama-3.3-70b-versatile",
+        model=GROQ_MODEL,
         messages=[
             {
                 "role": "user",
@@ -177,8 +177,8 @@ CODE TO REVIEW
 
     return response.choices[0].message.content
 
-def rewrite_code(code: str, language: str):
 
+def rewrite_code(code: str, language: str):
     prompt = f"""
 You are a principal software architect.
 
@@ -221,7 +221,7 @@ Code:
 """
 
     response = client.chat.completions.create(
-        model="llama-3.3-70b-versatile",
+        model=GROQ_MODEL,
         messages=[
             {
                 "role": "user",
