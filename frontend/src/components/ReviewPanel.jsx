@@ -1,527 +1,163 @@
-import { Prism as SyntaxHighlighter }
-from "react-syntax-highlighter";
+import React from "react";
+import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
+import { oneDark } from "react-syntax-highlighter/dist/esm/styles/prism";
+import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer } from "recharts";
+import toast from "react-hot-toast";
 
-import { oneDark }
-from "react-syntax-highlighter/dist/esm/styles/prism";
-
-import {
-  PieChart,
-  Pie,
-  Cell,
-  Tooltip
-}
-from "recharts";
-
-export default function ReviewPanel({
-  review
-}) {
-
+export default function ReviewPanel({ review }) {
   if (!review) return null;
 
-
-  const COLORS = [
-    "#ef4444",
-    "#f97316",
-    "#eab308",
-    "#22c55e"
-  ];
-
+  const criticalIssues = review.critical || [];
+  const highIssues = review.high || [];
+  const mediumIssues = review.medium || [];
+  const lowIssues = review.low || [];
 
   const chartData = [
-
-    {
-      name: "Critical",
-      value: review.critical.length
-    },
-
-    {
-      name: "High",
-      value: review.high.length
-    },
-
-    {
-      name: "Medium",
-      value: review.medium.length
-    },
-
-    {
-      name: "Low",
-      value: review.low.length
-    }
-
+    { name: "Critical", value: criticalIssues.length },
+    { name: "High", value: highIssues.length },
+    { name: "Medium", value: mediumIssues.length },
+    { name: "Low", value: lowIssues.length },
   ];
 
+  const COLORS = ["#ef4444", "#f97316", "#eab308", "#22c55e"];
+  const totalIssues = criticalIssues.length + highIssues.length + mediumIssues.length + lowIssues.length;
 
-  const renderIssues = (
-    issues,
-    title,
-    titleColor,
-    cardColor
-  ) => {
-
-    return (
-
-      <div className="mb-8">
-
-        <h3 className={`font-bold text-xl mb-3 ${titleColor}`}>
-          {title}
-        </h3>
-
-        {
-
-          issues.length === 0
-
-            ?
-
-            (
-
-              <div className="
-              bg-slate-900
-              border
-              border-slate-700
-              rounded-xl
-              p-5
-              shadow-lg
-              ">
-
-                <p className="text-gray-300">
-
-                  No Issues Found ✅
-
-                </p>
-
+  const renderIssueCategory = (issues, title, titleColor, cardBgBorder) => (
+    <div className="mb-6">
+      <h4 className={`font-bold text-base mb-3 ${titleColor}`}>
+        {title} ({issues.length})
+      </h4>
+      {issues.length === 0 ? (
+        <div className="bg-slate-900 border border-slate-800 rounded-lg p-3 text-xs text-slate-400">
+          No issues detected in this category. ✅
+        </div>
+      ) : (
+        issues.map((issue, idx) => (
+          <div key={idx} className={`border rounded-lg p-4 mb-3 text-sm ${cardBgBorder}`}>
+            <div className="flex justify-between font-semibold mb-1">
+              <span>Issue: {issue.issue}</span>
+              {issue.line > 0 && <span className="text-xs opacity-80">Line {issue.line}</span>}
+            </div>
+            {issue.explanation && (
+              <p className="text-slate-300 text-xs mb-2 leading-relaxed">{issue.explanation}</p>
+            )}
+            {issue.fix && (
+              <div className="mt-2">
+                <span className="text-xs font-semibold text-slate-300 block mb-1">Suggested Fix:</span>
+                <SyntaxHighlighter
+                  language="python"
+                  style={oneDark}
+                  showLineNumbers={false}
+                  customStyle={{ borderRadius: "6px", fontSize: "12px", padding: "8px" }}
+                >
+                  {issue.fix}
+                </SyntaxHighlighter>
               </div>
-
-            )
-
-            :
-
-            (
-
-              issues.map(
-
-                (
-                  issue,
-                  index
-                ) => (
-
-                  <div
-                    key={index}
-                    className={`border rounded-xl p-5 mb-4 ${cardColor}`}
-                  >
-
-                    <div className="mb-2">
-
-                      <span className="font-bold">
-
-                        Line:
-
-                      </span>
-
-                      {" "}
-
-                      {issue.line}
-
-                    </div>
-
-
-                    <div className="mb-2">
-
-                      <span className="font-bold">
-
-                        Issue:
-
-                      </span>
-
-                      {" "}
-
-                      {issue.issue}
-
-                    </div>
-
-
-                    <div className="mb-2">
-
-                      <span className="font-bold">
-
-                        Explanation:
-
-                      </span>
-
-                      <p className="text-gray-200 mt-1">
-
-                        {issue.explanation}
-
-                      </p>
-
-                    </div>
-
-
-                    <div>
-
-                      <span className="font-bold">
-
-                        Suggested Fix
-
-                      </span>
-
-                      <SyntaxHighlighter
-                        language="python"
-                        style={oneDark}
-                        showLineNumbers
-                        customStyle={{
-                          borderRadius: "10px"
-                        }}
-                      >
-
-                        {issue.fix}
-
-                      </SyntaxHighlighter>
-
-                    </div>
-
-                  </div>
-
-                )
-
-              )
-
-            )
-
-        }
-
-      </div>
-
-    );
-
-  };
-
-
-  return (
-
-    <div className="
-    bg-slate-800
-    p-6
-    rounded-xl
-    shadow-lg
-    text-white
-    ">
-
-      {/* Statistics */}
-
-      <div className="grid grid-cols-4 gap-3 mb-8">
-
-        <div className="bg-red-600 rounded-lg p-4 text-center">
-
-          <p>
-
-            Critical
-
-          </p>
-
-          <h1 className="text-3xl font-bold">
-
-            {review.critical.length}
-
-          </h1>
-
-        </div>
-
-
-        <div className="bg-orange-500 rounded-lg p-4 text-center">
-
-          <p>
-
-            High
-
-          </p>
-
-          <h1 className="text-3xl font-bold">
-
-            {review.high.length}
-
-          </h1>
-
-        </div>
-
-
-        <div className="bg-yellow-500 rounded-lg p-4 text-center">
-
-          <p>
-
-            Medium
-
-          </p>
-
-          <h1 className="text-3xl font-bold">
-
-            {review.medium.length}
-
-          </h1>
-
-        </div>
-
-
-        <div className="bg-green-600 rounded-lg p-4 text-center">
-
-          <p>
-
-            Low
-
-          </p>
-
-          <h1 className="text-3xl font-bold">
-
-            {review.low.length}
-
-          </h1>
-
-        </div>
-
-      </div>
-
-
-      {/* Pie Chart */}
-
-      <div className="
-      bg-slate-900
-      rounded-xl
-      p-6
-      mb-8
-      flex
-      flex-col
-      items-center
-      ">
-
-        <h2 className="
-        text-2xl
-        font-bold
-        mb-6
-        ">
-
-          Issue Distribution
-
-        </h2>
-
-        <PieChart
-          width={350}
-          height={300}
-        >
-
-          <Pie
-            data={chartData}
-            cx="50%"
-            cy="50%"
-            outerRadius={100}
-            dataKey="value"
-            label
-          >
-
-            {
-
-              chartData.map(
-
-                (
-                  entry,
-                  index
-                ) => (
-
-                  <Cell
-                    key={index}
-                    fill={
-                      COLORS[index]
-                    }
-                  />
-
-                )
-
-              )
-
-            }
-
-          </Pie>
-
-          <Tooltip />
-
-        </PieChart>
-
-      </div>
-
-
-      {/* Heading */}
-
-      <div className="flex items-center justify-between mb-8">
-
-        <h2 className="text-3xl font-bold">
-
-          Review Results
-
-        </h2>
-
-
-        <button
-          className="
-          bg-blue-600
-          hover:bg-blue-700
-          px-4
-          py-2
-          rounded-lg
-          "
-          onClick={() => {
-
-            navigator.clipboard.writeText(
-              review.optimized_code
-            );
-
-          }}
-        >
-
-          📋 Copy Code
-
-        </button>
-
-      </div>
-
-
-
-      {renderIssues(
-        review.critical,
-        "🔴 Critical Issues",
-        "text-red-400",
-        "bg-red-950 border-red-700"
+            )}
+          </div>
+        ))
       )}
-
-
-      {renderIssues(
-        review.high,
-        "🟠 High Issues",
-        "text-orange-400",
-        "bg-orange-950 border-orange-700"
-      )}
-
-
-      {renderIssues(
-        review.medium,
-        "🟡 Medium Issues",
-        "text-yellow-400",
-        "bg-yellow-950 border-yellow-700"
-      )}
-
-
-      {renderIssues(
-        review.low,
-        "🟢 Low Issues",
-        "text-green-400",
-        "bg-green-950 border-green-700"
-      )}
-
-
-      {/* Summary */}
-
-      <div className="mt-8">
-
-        <h3 className="font-bold text-2xl mb-3">
-
-          Summary
-
-        </h3>
-
-        <div className="
-        bg-slate-700
-        rounded-xl
-        p-4
-        ">
-
-          <p className="text-gray-300 leading-relaxed">
-
-            {review.summary}
-
-          </p>
-
-        </div>
-
-      </div>
-
-
-
-      {/* Optimized Code */}
-
-      <div className="mt-8">
-
-        <div className="flex justify-between items-center mb-3">
-
-          <h3 className="font-bold text-2xl">
-
-            Optimized Code
-
-          </h3>
-
-
-          <button
-            className="
-            bg-green-600
-            hover:bg-green-700
-            px-4
-            py-2
-            rounded-lg
-            "
-            onClick={() => {
-
-              const blob =
-                new Blob(
-                  [
-                    review.optimized_code
-                  ],
-                  {
-                    type: "text/plain"
-                  }
-                );
-
-              const url =
-                URL.createObjectURL(
-                  blob
-                );
-
-              const a =
-                document.createElement(
-                  "a"
-                );
-
-              a.href = url;
-
-              a.download =
-                "optimized_code.txt";
-
-              a.click();
-
-            }}
-          >
-
-            ⬇ Download
-
-          </button>
-
-        </div>
-
-
-        <SyntaxHighlighter
-          language="python"
-          style={oneDark}
-          showLineNumbers
-          customStyle={{
-            borderRadius: "12px",
-            maxHeight: "500px"
-          }}
-        >
-
-          {review.optimized_code}
-
-        </SyntaxHighlighter>
-
-      </div>
-
     </div>
-
   );
 
+  return (
+    <div className="bg-slate-900 border border-slate-800 p-5 rounded-xl shadow-md text-white">
+      <h3 className="text-xl font-bold mb-4">Review Results</h3>
+
+      {/* Severity Metrics Cards */}
+      <div className="grid grid-cols-4 gap-2 mb-6">
+        <div className="bg-red-950/80 border border-red-800/80 rounded-lg p-2 text-center">
+          <span className="text-xs text-red-300 font-medium block">Critical</span>
+          <span className="text-xl font-bold text-red-400">{criticalIssues.length}</span>
+        </div>
+        <div className="bg-orange-950/80 border border-orange-800/80 rounded-lg p-2 text-center">
+          <span className="text-xs text-orange-300 font-medium block">High</span>
+          <span className="text-xl font-bold text-orange-400">{highIssues.length}</span>
+        </div>
+        <div className="bg-yellow-950/80 border border-yellow-800/80 rounded-lg p-2 text-center">
+          <span className="text-xs text-yellow-300 font-medium block">Medium</span>
+          <span className="text-xl font-bold text-yellow-400">{mediumIssues.length}</span>
+        </div>
+        <div className="bg-emerald-950/80 border border-emerald-800/80 rounded-lg p-2 text-center">
+          <span className="text-xs text-emerald-300 font-medium block">Low</span>
+          <span className="text-xl font-bold text-emerald-400">{lowIssues.length}</span>
+        </div>
+      </div>
+
+      {/* Issue Distribution Chart */}
+      {totalIssues > 0 && (
+        <div className="bg-slate-950 border border-slate-800 rounded-xl p-4 mb-6 text-center">
+          <h4 className="text-sm font-semibold text-slate-300 mb-2">Issue Distribution</h4>
+          <div className="h-44 w-full flex items-center justify-center">
+            <ResponsiveContainer width="100%" height="100%">
+              <PieChart>
+                <Pie data={chartData} cx="50%" cy="50%" outerRadius={60} dataKey="value">
+                  {chartData.map((_, index) => (
+                    <Cell key={index} fill={COLORS[index]} />
+                  ))}
+                </Pie>
+                <Tooltip />
+              </PieChart>
+            </ResponsiveContainer>
+          </div>
+        </div>
+      )}
+
+      {/* Summary Box */}
+      {review.summary && (
+        <div className="mb-6 bg-slate-800/80 border border-slate-700 p-4 rounded-xl">
+          <h4 className="font-bold text-sm text-slate-200 mb-1">Summary Overview</h4>
+          <p className="text-xs text-slate-300 leading-relaxed">{review.summary}</p>
+        </div>
+      )}
+
+      {/* Categorized Issues */}
+      {renderIssueCategory(criticalIssues, "🔴 Critical Issues", "text-red-400", "bg-red-950/40 border-red-800/60")}
+      {renderIssueCategory(highIssues, "🟠 High Severity Issues", "text-orange-400", "bg-orange-950/40 border-orange-800/60")}
+      {renderIssueCategory(mediumIssues, "🟡 Medium Severity Issues", "text-yellow-400", "bg-yellow-950/40 border-yellow-800/60")}
+      {renderIssueCategory(lowIssues, "🟢 Low Severity Issues", "text-emerald-400", "bg-emerald-950/40 border-emerald-800/60")}
+
+      {/* Optimized Code Box */}
+      {review.optimized_code && (
+        <div className="mt-6 border-t border-slate-800 pt-4">
+          <div className="flex justify-between items-center mb-2">
+            <h4 className="font-bold text-sm text-emerald-400">Optimized Code</h4>
+            <div className="flex gap-2">
+              <button
+                onClick={() => {
+                  navigator.clipboard.writeText(review.optimized_code);
+                  toast.success("Optimized code copied!");
+                }}
+                className="bg-blue-600 hover:bg-blue-700 text-white text-xs px-2.5 py-1.5 rounded"
+              >
+                Copy
+              </button>
+              <button
+                onClick={() => {
+                  const blob = new Blob([review.optimized_code], { type: "text/plain" });
+                  const url = URL.createObjectURL(blob);
+                  const a = document.createElement("a");
+                  a.href = url;
+                  a.download = "optimized_code.txt";
+                  a.click();
+                  toast.success("File download started!");
+                }}
+                className="bg-emerald-600 hover:bg-emerald-700 text-white text-xs px-2.5 py-1.5 rounded"
+              >
+                Download
+              </button>
+            </div>
+          </div>
+          <SyntaxHighlighter
+            language="python"
+            style={oneDark}
+            showLineNumbers
+            customStyle={{ borderRadius: "8px", fontSize: "12px", maxHeight: "300px" }}
+          >
+            {review.optimized_code}
+          </SyntaxHighlighter>
+        </div>
+      )}
+    </div>
+  );
 }

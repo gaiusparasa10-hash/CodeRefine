@@ -1,37 +1,19 @@
-import {
-  BrowserRouter,
-  Routes,
-  Route
-} from "react-router-dom";
-
-import ProtectedRoute
-from "./components/ProtectedRoute";
-
+import React from "react";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+import ProtectedRoute from "./components/ProtectedRoute";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import Dashboard from "./pages/Dashboard";
-import History from "./pages/History";
+import History from "./pages/history";
 import Profile from "./pages/Profile";
 
-function App() {
-
+export default function App() {
   return (
-
     <BrowserRouter>
-
       <Routes>
-
+        <Route path="/" element={<Login />} />
+        <Route path="/register" element={<Register />} />
         <Route
-          path="/"
-          element={<Login />}
-        />
-
-        <Route
-          path="/register"
-          element={<Register />}
-        />
-
-       <Route
           path="/dashboard"
           element={
             <ProtectedRoute>
@@ -39,28 +21,23 @@ function App() {
             </ProtectedRoute>
           }
         />
-
         <Route
           path="/history"
           element={
             <ProtectedRoute>
-             <History />
+              <History />
             </ProtectedRoute>
           }
         />
-        
         <Route
           path="/profile"
           element={
             <ProtectedRoute>
-              <Profile/>
+              <Profile />
             </ProtectedRoute>
           }
         />
       </Routes>
-
     </BrowserRouter>
   );
 }
-
-export default App;

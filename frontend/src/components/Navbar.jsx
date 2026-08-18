@@ -1,102 +1,59 @@
+import React from "react";
+import { useNavigate, useLocation } from "react-router-dom";
 import toast from "react-hot-toast";
 
 export default function Navbar() {
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    toast.success("Logged Out");
+    navigate("/");
+  };
+
+  const isActive = (path) => location.pathname === path;
 
   return (
-
-    <div className="
-    flex
-    justify-between
-    items-center
-    mb-8
-    ">
-
+    <header className="flex flex-col sm:flex-row justify-between items-center pb-6 mb-8 border-b border-slate-800 gap-4">
       <div>
-
-        <h1 className="text-4xl font-bold">
-          CodeRefine 🚀
-        </h1>
-
-        <p className="text-gray-400">
-
-          AI-Powered Code Review
-
-        </p>
-
+        <div className="flex items-center gap-2">
+          <span className="text-2xl">⚡</span>
+          <h1 className="text-3xl font-extrabold text-white tracking-tight">CodeRefine</h1>
+        </div>
+        <p className="text-sm text-slate-400 mt-1">AI-Powered Code Review & Optimization Platform</p>
       </div>
 
-
-      <div className="flex gap-3">
-
+      <nav className="flex items-center gap-3">
         <button
-          className="
-          bg-indigo-600
-          px-4
-          py-2
-          rounded-lg
-          "
-          onClick={() => {
-
-            window.location.href =
-              "/dashboard";
-
-          }}
+          onClick={() => navigate("/dashboard")}
+          className={`px-4 py-2 rounded-lg text-sm font-medium transition ${
+            isActive("/dashboard")
+              ? "bg-blue-600 text-white shadow-md shadow-blue-500/20"
+              : "bg-slate-800 text-slate-300 hover:bg-slate-700 hover:text-white"
+          }`}
         >
-          Dashboard
+          Home
         </button>
 
-
         <button
-          className="
-          bg-green-600
-          px-4
-          py-2
-          rounded-lg
-          "
-          onClick={() => {
-
-            window.location.href =
-              "/history";
-
-          }}
+          onClick={() => navigate("/history")}
+          className={`px-4 py-2 rounded-lg text-sm font-medium transition ${
+            isActive("/history")
+              ? "bg-blue-600 text-white shadow-md shadow-blue-500/20"
+              : "bg-slate-800 text-slate-300 hover:bg-slate-700 hover:text-white"
+          }`}
         >
-          History
+          Reviews History
         </button>
 
-
         <button
-          className="
-          bg-red-600
-          px-4
-          py-2
-          rounded-lg
-          "
-          onClick={() => {
-
-            localStorage.removeItem(
-              "token"
-            );
-
-            toast.success(
-              "Logged Out"
-            );
-
-            setTimeout(() => {
-
-              window.location.href =
-                "/";
-
-            },1000);
-
-          }}
+          onClick={handleLogout}
+          className="px-4 py-2 rounded-lg text-sm font-medium bg-red-600/80 hover:bg-red-600 text-white transition"
         >
           Logout
         </button>
-
-      </div>
-
-    </div>
-
+      </nav>
+    </header>
   );
-
 }
